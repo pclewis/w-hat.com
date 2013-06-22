@@ -485,7 +485,6 @@ default {
 		&copy; 20XX W-Hat Corporation
 	</footer>
 	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-	<script src="jquery.autogrowtextarea.min.js"></script>
 	<script>
 		jQuery.fn.highlight = function(interval) {
 			var els = $(this);
@@ -523,8 +522,6 @@ default {
 
 		$('section').hide();
 		$(window).trigger('hashchange');
-
-		$('#name2key-name').autoGrow();
 
 		$('#name2key-form').submit( function(e) {
 			e.preventDefault();
