@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>W-Hat.com: SL Tools</title>
+	<style type="text/css">
+		@import url(http://fonts.googleapis.com/css?family=Dosis:600);
+		html { height: 100%; }
+		body {
+			background-color: #0a0a0a;
+			background-image: url('wgraf960-r.png');
+			background-position: bottom right;
+			background-attachment: fixed;
+			background-repeat: no-repeat;
+			color: #cccccc;
+			height: 100%;
+			margin: 0;
+		}
+
+		h1 {
+			height: 100px;
+			line-height: 100px;
+			padding-left: 150px;
+			background-color: #3b3b3b;
+			background-image: url('logo2-g.gif');
+			background-position: left center;
+			background-repeat: no-repeat;
+			text-transform: uppercase;
+			font-family: 'Dosis', Impact, sans-serif;
+			font-size: 64px;
+			margin: 0 -0.5em;
+			color: #00ccff;
+		}
+
+		h2 {
+			color: #aaccff;
+		}
+
+
+		a:link { color: #669; }
+		a:visited { color: #858; }
+		a:active { color: #da9; }
+
+		section {
+			position: relative;
+			padding: 2em;
+			width: 37em;
+			background-color: rgba(32,32,32,0.9);
+			min-height: 100%;
+			height: auto;
+		}
+
+		p {
+			font-family: "Trebuchet MS", Arial, sans-serif;
+			text-align: justify;
+			margin: 1em;
+		}
+
+		li { font-family: "Trebuchet MS", Arial, sans-serif; }
+
+		nav {
+			position: fixed;
+			left: 41em;
+		}
+
+		nav ul {
+			padding: 0;
+			margin: 0;
+		}
+		nav li {
+			padding: 1em;
+			list-style-type: none;
+			background-color: rgba(32,32,32,0.5);
+		}
+		nav li.selected {
+			background-color: rgba(32,32,32,0.9);
+		}
+
+		footer {
+			font-family: verdana;
+			font-size: 70%;
+			position: fixed;
+			bottom: 5px;
+			width: 100%;
+			text-align: center;
+		}
+
+		fieldset {
+			border: 0;
+			margin: 1em;
+		}
+
+		#name2key-results {
+			margin: 0 1em;
+			padding: 0;
+		}
+		#name2key-results td {
+			margin: 0;
+			padding: 0 1em;
+		}
+		#name2key-results tbody tr:only-child * {
+			display: none;
+		}
+
+		#name2key-results td:nth-child(2) {
+			font-family: monospace;
+		}
+
+		textarea {
+			display: block;
+			width: 100%;
+			height: 5em;
+		}
+
+		input, textarea {
+			border: 1px solid #333;
+			background-color: #aaa;
+		}
+
+		button {
+			border-radius: 3px;
+			border: 1px solid #333;
+			background-color: #aaa;
+		}
+
+		pre {
+			font-family: "Lucida Console", monospace;
+			font-size: 70%;
+			margin: 1em;
+			padding: 1em;
+			border: 1px dashed #333;
+			background-color: #444;
+		}
+
+		code {
+			white-space: nowrap;
+		}
+	</style>
+</head>
+<body>
+	<nav>
+		<ul>
+			<li><a href="#faq">home/faq</a></li>
+			<li><a href="#name2key">name2key</a></li>
+			<li><a href="#httpdb">httpdb</a></li>
+			<li><a href="#lslint">lslint</a></li>
+		</ul>
+	</nav>
+	<section id="faq">
+		<h1>faq</h1>
+
+		<h2>What is W-Hat.com?</h2>
+		<p>W-Hat.com provides a couple of useful services for LSL developers:</p>
+		<ul>
+			<li><a href="#name2key">name2key</a> provides a way to get an avatar's key from their name.</li>
+			<li><a href="#httpdb">httpdb</a> provides free key/value storage for scripts with no signup.</li>
+			<li><a href="#lslint">lslint</a> is a lint tool for LSL scripts</li>
+		</ul>
+		<p>In the past, we also offered:</p>
+		<ul>
+			<li>objdns provided email aliases for objects.</li>
+			<li>httpmail let objects send email to other objects via HTTP.</li>
+		</ul>
+
+		<h2>What happened to W-Hat?</h2>
+		<p>The group became inactive and faded into obscurity as its members grew up. In 2011 the owner
+			of the group and land was quietly banned from Second Life.</p>
+		<p>Some of us still hang out in <code>#sl</code> on <code>irc.synirc.net</code>, but almost
+			nobody still plays Second Life.</p>
+
+		<h2>Can I...</h2>
+		<p>Yes, please do. Everything on this site is free and open source and all the services are
+			free to use and abuse in any manner you see fit.</p>
+
+		<h2>Who runs this site?</h2>
+		<p>masa@w-hat.com</p>
+
+		<h2>Where'd the postcards go?</h2>
+		<p>Watch this space for a zip.</p>
+	</section>
+
+	<section id="name2key">
+		<h1>name2key</h1>
+
+		<h2>Look up keys</h2>
+		<p>Enter as many names as you want, separated by anything other than spaces.</p>
+		<form id="name2key-form" action="name2key" method="GET">
+			<fieldset>
+				<textarea id="name2key-name" name="name"></textarea><button id="name2key-lookup">lookup</button>
+			</fieldset>
+		</form>
+		<table id="name2key-results">
+			<tbody>
+			<tr><td colspan="2"><button id="name2key-clear">clear</button></td></tr>
+			</tbody>
+		</table>
+
+		<h2>Add keys to database</h2>
+		<p>Paste keys in this box to add them to the database. Formatting and extraneous text don't
+			matter; anything that doesn't look like a UUID will be ignored.</p>
+		<form id="key-form" action="name2key" method="GET">
+		<fieldset>
+			<textarea id="keys" name="keys"></textarea>
+			<button>submit</button>
+		</fieldset>
+		</form>
+
+		<h2>Look up keys with a script</h2>
+		<pre>
+string NAME  = "Masakazu Kojima";           // name to look up
+string URL   = "http://w-hat.com/name2key"; // name2key url
+key    reqid;                               // http request id
+
+default {
+    state_entry() {
+        reqid = llHTTPRequest( URL + "/" + llEscapeURL(NAME), [], "" );
+    }
+
+    http_response(key id, integer status, list meta, string body) {
+        if ( id != reqid )
+            return;
+        if ( status == 499 )
+            llOwnerSay("name2key request timed out");
+        else if ( status == 400 )
+            llOwnerSay("Invalid name: " + NAME);
+        else if ( status == 404 )
+            llOwnerSay("No key found for " + NAME);
+        else if ( status != 200 )
+            llOwnerSay("the internet exploded!!");
+        else
+            llOwnerSay(NAME + "'s key is: " + body );
+    }
+}
+		</pre>
+		<p>To look up a name, just make a GET request to <code>http://w-hat.com/name2key/user.name</code>.
+			You can also use the old API: <code>http://w-hat.com/name2key?name=user.name&amp;terse=1</code>.</p>
+
+		<h2>I don't want my key listed!</h2>
+		<p>There is no reason to worry about somebody else having your key. It is not a secret, it is
+			just an identifier that LSL scripts use to interact with you.</p>
+
+		<h2>Other databases</h2>
+		<ul>
+			<li><a href="http://name2key.haxworx.net/">HaxWork name2key</a> - Uses SL search as backup
+				and crossfeeds into W-Hat database.</li>
+			<li><a href="http://kdc.ethernia.net/sys/name2key.php">KDC's database</a> - Kyrah Abattoir's
+				database. Has been around for a long time.</li>
+		</ul>
+
+	</section>
+
+	<section id="lslint">
+		<h1>lslint</h1>
+
+		<h2>lint for LSL</h2>
+		<p>lslint is a tool to check the syntactic and semantic validity of Second Life LSL scripts.</p>
+
+		<h2>Source and downloads</h2>
+		<p>Please see the <a href="http://github.com/pclewis/lslint">github page</a>.</p>
+
+		<h2>Try online</h2>
+		<p>Unfortunately, this feature is no longer available.</p>
+	</section>
+
+	<section id="httpdb">
+		<h1>httpdb</h1>
+
+		<h2>Free storage for LSL scripts</h2>
+		<p>httpdb provides free, persistant, off-site storage for Second Life LSL scripts via
+			llHTTPRequest. You can store up to 250kb of data in the form of key/value pairs, and
+			read or write the data from any script. You can share your data with other users, protect
+			it with passwords, browse and manage your data on the web, and download backups.</p>
+
+		<h2>Web Interface</h2>
+		<fieldset>
+			<label>Name/UUID: <input type="text" name="name" /></label>
+			<label>Password: <input type="password" name="password" /></label>
+			<button>Log In</button>
+		</fieldset>
+
+		<h2>Registration</h2>
+		<p>There is no need to register to use httpdb, you can just start saving and retrieving data
+			at any time.</p>
+	</section>
+	<footer>
+		&copy; 20XX W-Hat Corporation
+	</footer>
+	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script src="jquery.autogrowtextarea.min.js"></script>
+	<script>
+		jQuery.fn.highlight = function(interval) {
+			var els = $(this);
+			interval = interval || 500;
+			for(var i = 0; i <= interval; i += 50) {
+				(function(i) {
+					setTimeout( function() {
+						els.css('background-color', 'rgba(255,255,153,' + (1.0-i/interval) + ')');
+					}, i);
+				})(i);
+			}
+		}
+
+		var oldHash = window.location.hash || '#faq';
+
+		$(window).on('hashchange', function(e) {
+			var newHash = window.location.hash || '#faq';
+			$('section' + oldHash).hide();
+			$('nav li.selected').removeClass('selected');
+			$('nav li a[href=' + newHash + ']').closest('li').addClass('selected');
+			$('section' + newHash).show();
+			oldHash = newHash;
+		});
+
+		$('section').hide();
+		$(window).trigger('hashchange');
+
+		$('#name2key-name').autoGrow();
+
+		$('#name2key-form').submit( function(e) {
+			e.preventDefault();
+			var names = $('#name2key-name').val();
+			$('#name2key-name').val('').trigger('keyup');
+			$.each( names.split(/[^a-zA-Z0-9 .]+/), function(i, name) {
+				name = name.replace(/^\s+|\s+$/g, '');
+				var resultId = name.replace(/[^a-zA-Z0-9]/g, '_')
+				  , result = $('#' + resultId);
+
+				if(result.length !== 0) {
+					result.highlight();
+					return;
+				}
+
+				$.ajax("http://iroha.w-hat.com/name2key",
+					{ data: {terse: 1, name: name }
+					, complete: function(jqxhr) {
+						var result = jqxhr.responseText;
+						if(jqxhr.status === 404) result = 'Not Found';
+						$('<tr>')
+							.attr('id', resultId)
+							.append( $('<td>').text(name) )
+							.append( $('<td>').text(result) )
+							.prependTo('#name2key-results tbody')
+							.highlight();
+					}});
+			});
+		});
+
+		$('#name2key-clear').click( function(e) {
+			e.preventDefault();
+			$('#name2key-results').children('tbody').children(':not(:last-child)').remove();
+		})
+	</script>
+</body>
+</html>
