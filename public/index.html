@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>W-Hat.com: SL Tools</title>
+	<title>W-Hat.com</title>
 	<style type="text/css">
 		@import url(http://fonts.googleapis.com/css?family=Dosis:600);
 		html { height: 100%; }
@@ -105,6 +105,43 @@
 			font-family: monospace;
 		}
 
+		#name2key li > details {
+			font-size: 85%;
+		}
+
+		#name2key li > details summary {
+			font-family: "lucida console", monospace;
+		}
+		#name2key details table {
+			width: 1024px;
+			background-color: #333;
+			border: 1px solid #444;
+			border-radius: 15px;
+			box-shadow: 10px 10px 5px rgba(48,48,48,0.5);
+			padding: 0 0 10px 0;
+			margin: 5px 0 15px 5px;
+			font-size: 80%;
+		}
+
+		#name2key details table th {
+			text-align: center;
+		}
+
+		#name2key details table td {
+			vertical-align: top;
+			font-family: "lucida console", monospace;
+			white-space: pre;
+			padding: 2px 1em;
+		}
+
+		#name2key ul {
+			list-style-type: none;
+		}
+
+		#name2key details details {
+			margin: 1em;
+		}
+
 		textarea {
 			display: block;
 			width: 100%;
@@ -182,7 +219,7 @@
 		<h1>name2key</h1>
 
 		<h2>Look up keys</h2>
-		<p>Enter as many names as you want, separated by anything other than spaces.</p>
+		<p>Enter as many names as you want, separated by anything other than spaces or periods.</p>
 		<form id="name2key-form" action="name2key" method="GET">
 			<fieldset>
 				<textarea id="name2key-name" name="name"></textarea><button id="name2key-lookup">lookup</button>
@@ -197,12 +234,142 @@
 		<h2>Add keys to database</h2>
 		<p>Paste keys in this box to add them to the database. Formatting and extraneous text don't
 			matter; anything that doesn't look like a UUID will be ignored.</p>
-		<form id="key-form" action="name2key" method="GET">
+		<form id="key-form" action="name2key" method="POST">
 		<fieldset>
-			<textarea id="keys" name="keys"></textarea>
+			<textarea id="name2key-keys" name="keys"></textarea>
 			<button>submit</button>
 		</fieldset>
 		</form>
+		<div id="name2key-add-results">
+		</div>
+
+		<h2>API</h2>
+		<ul>
+			<li>
+				<details>
+					<summary>GET /name2key/&lt;name&gt;</summary>
+					<p>
+						Looks up a name. &lt;name&gt; may be in <a href="#name2key-username">user.name</a> or <a href="#name2key-resname">resident name</a> format.
+						If the name is found, returns status 200 and the UUID. If it is not found, returns status 404 and NULL_KEY.
+					</p>
+						<summary>Examples</summary>
+						<table>
+							<thead>
+								<tr><th colspan="2">Request</th><th colspan="2">Response</th></tr>
+								<tr><th>Method</th><th>URL</th><th>Status</th><th>Body</th></tr>
+							</thead>
+							<tbody>
+								<tr><td>GET</td><td>/name2key/Masakazu%20Kojima</td><td>200</td><td>a27b84f0-2757-4176-9579-43a181d4a5a0</td></tr>
+								<tr><td>GET</td><td>/name2key/goVeRnoR.linDEN</td><td>200</td><td>3d6181b0-6a4b-97ef-18d8-722652995cf1</td></tr>
+								<tr><td>GET</td><td>/name2key/a</td><td>404</td><td>00000000-0000-0000-0000-000000000000</td></tr>
+								<tr><td>GET</td><td>/name2key/username.a.a.a</td><td>400</td><td>Invalid name</td></tr>
+							</tbody>
+						</table>
+				</details>
+			</li>
+
+			<li>
+				<details>
+					<summary>GET /name2key?names=&lt;names&gt;</summary>
+					<p>
+						Looks up multiple names at once. &lt;names&gt; should be a list of up to 50 names in <a href="#name2key-username">user.name</a> or <a href="#name2key-resname">resident name</a> format
+						separated by anything that is unambiguous. Returns status 200 and a list of names exactly as input and corresponding UUIDs separated by newlines. If a key was not found the UUID will be NULL_KEY.
+					</p>
+					<details>
+						<summary>Examples</summary>
+						<table>
+							<thead>
+								<tr><th colspan="2">Request</th><th colspan="2">Response</th></tr>
+								<tr><th>Method</th><th>URL</th><th>Status</th><th>Body</th></tr>
+							</thead>
+							<tbody>
+								<tr><td>GET</td><td>/name2key?names=Masakazu%20Kojima,governor.linden,username,a</td><td>200</td>
+<td>Masakazu Kojima a27b84f0-2757-4176-9579-43a181d4a5a0
+governor.linden 3d6181b0-6a4b-97ef-18d8-722652995cf1
+username 3223a4e4-01c6-44f8-9aa1-df790e02aa93
+a 00000000-0000-0000-0000-000000000000</td></tr>
+								<tr><td>GET</td><td>/name2key/?names=username.a.a.a</td><td>200</td>
+<td>username.a 00000000-0000-0000-0000-000000000000
+a.a 00000000-0000-0000-0000-000000000000</td></tr>
+							</tbody>
+						</table>
+					</details>
+				</details>
+			</li>
+
+			<li>
+				<details>
+					<summary>GET /key2name/&lt;uuid&gt;</summary>
+					<p>
+						Look up a UUID. If found, returns 200 and the name in <a href="#name2key-canonical">canonical user.name</a> format. If not found, returns 404 and an empty string.
+						Note this may attempt to resolve keys via world.secondlife.com and in-world search and may wait up to 60 seconds before returning a negative response.
+					</p>
+					<details>
+						<summary>Examples</summary>
+						<table>
+							<thead>
+								<tr><th colspan="2">Request</th><th colspan="2">Response</th></tr>
+								<tr><th>Method</th><th>URL</th><th>Status</th><th>Body</th></tr>
+							</thead>
+							<tbody>
+								<tr><td>GET</td><td>/key2name/a27b84f0-2757-4176-9579-43a181d4a5a0</td><td>200</td><td>masakazu.kojima</td></tr>
+								<tr><td>GET</td><td>/key2name/3223a4e4-01c6-44f8-9aa1-df790e02aa93</td><td>200</td><td>username</td></tr>
+								<tr><td>GET</td><td>/key2name/a27b84f0-2757-4176-9579-43a181d4a5a1</td><td>404</td><td></td></tr>
+								<tr><td>GET</td><td>/key2name/a27b84f0-2757-4176-9579-43a181d4a5a</td><td>404</td><td>(undefined)</td></tr>
+							</tbody>
+						</table>
+					</details>
+				</details>
+			</li>
+
+			<li>
+				<details>
+					<summary>POST /name2key</summary>
+					<p>
+						Add keys to the database. The request body should contain one or more UUIDs separated by anything (or nothing). Keys will be queued up for resolution
+						and an <em>estimate</em> of the number of new keys will be returned. Always returns status 200.
+					</p>
+				</details>
+			</li>
+
+			<li>
+				<details>
+					<summary>GET|POST /name2key?keys=&lt;keys&gt; (DEPRECATED)</summary>
+					<p>
+						Add keys to the database. &lt;keys&gt; should contain one or more UUIDs separated by anything (or nothing). Keys will be queued up for resolution
+						and an <em>estimate</em> of the number of new keys will be returned. Always returns status 200.
+						This API only exists to preserve compatibility with older scripts, and should not be used in new scripts.
+					</p>
+			</li>
+
+			<li>
+				<details>
+					<summary>GET|POST /name2key?name=&lt;name&gt;[&amp;terse=1] (DEPRECATED)</summary>
+					<p>
+						Looks up a name in the database or SL search. Name may be in <a href="#name2key-username">user.name</a> or <a href="#name2key-resname">resident name</a> format.
+						If the name is found, returns status 200 and the UUID. If it is not found, returns <em>status 200</em> and NULL_KEY.
+						When terse=1 is not specified, result UUIDs will be prefixed by the name exactly the same as input, and the string "None found" will be returned instead of NULL_KEY.
+						This API only exists to preserve compatibility with older scripts, and should not be used in new scripts.
+					</p>
+					<details>
+						<summary>Examples</summary>
+						<table>
+							<thead>
+								<tr><th colspan="2">Request</th><th colspan="2">Response</th></tr>
+								<tr><th>Method</th><th>URL</th><th>Status</th><th>Body</th></tr>
+							</thead>
+							<tbody>
+								<tr><td>GET</td><td>/name2key?name=Masakazu%20Kojima</td><td>200</td><td>Masakazu Kojima a27b84f0-2757-4176-9579-43a181d4a5a0</td></tr>
+								<tr><td>GET</td><td>/name2key/?name=goVeRnoR.linDEN</td><td>200</td><td>goVeRnoR.linDEN 3d6181b0-6a4b-97ef-18d8-722652995cf1</td></tr>
+								<tr><td>GET</td><td>/name2key/?name=goVeRnoR.linDEN&amp;terse=1</td><td>200</td><td>3d6181b0-6a4b-97ef-18d8-722652995cf1</td></tr>
+								<tr><td>POST</td><td>/name2key/?name=a</td><td>200</td><td>None found</td></tr>
+								<tr><td>POST</td><td>/name2key/?name=a&amp;terse=1</td><td>200</td><td>00000000-0000-0000-0000-000000000000</td></tr>
+							</tbody>
+						</table>
+					</details>
+				</details>
+		</ul>
+
 
 		<h2>Look up keys with a script</h2>
 		<pre>
@@ -244,6 +411,39 @@ default {
 				and crossfeeds into W-Hat database.</li>
 			<li><a href="http://kdc.ethernia.net/sys/name2key.php">KDC's database</a> - Kyrah Abattoir's
 				database. Has been around for a long time.</li>
+		</ul>
+
+		<h2>Name Formats</h2>
+		<p>Since Second Life introduced usernames, the concept of what a name is has gotten complicated. The service understands <em>four</em> types of names:
+			<ul>
+				<li><details id="name2key-resname"><summary>Resident Name (First Last)</summary>
+					<p>Resident Names are the original format. Everybody has a first and last name, separated by a space.
+						Accounts created after the switch to usernames have the last name Resident. Examples: Masakazu Kojima, Governor Linden, Username Resident</p>
+				</details></li>
+				<li><details id="name2key-username"><summary>Username (First.Last)</summary>
+					<p>Usernames are the new format. The first and last name are separated by a period (.), and the last name is
+						optional if it is "resident". "username.resident" and "username" are equivalent. Examples: Masakazu.Kojima, governor.linden, username.resident, username</p>
+				</details></li>
+				<li><details id="name2key-canonical"><summary>Canonical Username (first.last)</summary>
+					<p>Canonical usernames are what this database stores. They are the same as usernames, exept they are always
+						lowercase, and anything that can be omitted is. "username.resident" is not a valid canonical name. Examples: masakazu.kojima, governor.linden, username</p>
+				</details></li>
+				<li><details><summary>Display Name</summary>
+					<p>A display name is freeform text that can be entered by a user and is displayed instead of their username.
+						This is used in search results and profile pages. The actual account name is always appended in parenthesis. Examples: Governor Linden (masakazu.kojima), Plastic Duck (username)</p>
+				</details></li>
+			</ul>
+		</p>
+
+		<h2>Nightly CSV</h2>
+		<p>These files are updated daily at 08:00 UTC. Names are in Title Case <a href="#name2key-resname">resident name</a> format,
+			and the file is sorted by UUID.</p>
+		<ul>
+			<li><a href="name2key.csv.bz2">full bzip2</a> (~133MB)</li>
+			<li><a href="name2key.csv.rar">full rar</a> (~145MB)</li>
+			<li><a href="name2key.csv.gz">full gzip</a> (~161MB)</li>
+			<li><a href="name2key.csv.zip">full zip</a> (~161MB)</li>
+			<li><a href="name2key.new.csv.bz2">new only bzip2</a> (~326KB)</li>
 		</ul>
 
 	</section>
@@ -299,15 +499,26 @@ default {
 			}
 		}
 
-		var oldHash = window.location.hash || '#faq';
+		function getCurrentSection() {
+			return (window.location.hash || '#faq').replace(/-.*$/, '');
+		}
+
+		var oldHash = '';
 
 		$(window).on('hashchange', function(e) {
-			var newHash = window.location.hash || '#faq';
-			$('section' + oldHash).hide();
-			$('nav li.selected').removeClass('selected');
-			$('nav li a[href=' + newHash + ']').closest('li').addClass('selected');
-			$('section' + newHash).show();
-			oldHash = newHash;
+			var newHash = getCurrentSection();
+			if(newHash !== oldHash) {
+				$('section' + oldHash).hide();
+				$('nav li.selected').removeClass('selected');
+				$('nav li a[href=' + newHash + ']').closest('li').addClass('selected');
+				$('section' + newHash).show();
+				oldHash = newHash;
+			}
+
+			var $what = $(window.location.hash);
+			if($what.prop("tagName").toLowerCase() === 'details') {
+				$what.attr('open', true).highlight();
+			}
 		});
 
 		$('section').hide();
@@ -329,7 +540,7 @@ default {
 					return;
 				}
 
-				$.ajax("http://iroha.w-hat.com/name2key",
+				$.ajax("http://w-hat.com/name2key",
 					{ data: {terse: 1, name: name }
 					, complete: function(jqxhr) {
 						var result = jqxhr.responseText;
@@ -348,6 +559,18 @@ default {
 			e.preventDefault();
 			$('#name2key-results').children('tbody').children(':not(:last-child)').remove();
 		})
+
+		$('#key-form').submit( function(e) {
+			e.preventDefault();
+			$.ajax("http://w-hat.com/name2key",
+				{ data: $('#key-form').serialize()
+				, method: 'POST'
+				, complete: function(jqxhr) {
+					var result = jqxhr.responseText;
+					$('#name2key-add-results').text(result).highlight();
+				}});
+			$('#name2key-keys').val('');
+		});
 	</script>
 </body>
 </html>
