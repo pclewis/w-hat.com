@@ -237,7 +237,7 @@
 		<p>Enter as many names as you want, separated by anything other than spaces or periods.</p>
 		<form id="name2key-form" action="name2key" method="GET">
 			<fieldset>
-				<textarea id="name2key-name" name="name"></textarea><button id="name2key-lookup">lookup</button>
+				<textarea id="name2key-name" name="names"></textarea><button id="name2key-lookup">lookup</button>
 			</fieldset>
 		</form>
 		<table id="name2key-results">
@@ -530,7 +530,7 @@ default {
 			}
 
 			var $what = $(window.location.hash);
-			if($what.prop("tagName").toLowerCase() === 'details') {
+			if(($what.prop("tagName") || '').toLowerCase() === 'details') {
 				$what.attr('open', true).highlight();
 			}
 		});
