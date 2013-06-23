@@ -2,7 +2,11 @@
 
 http://w-hat.com
 
-## License
+## Image License
+
+The images in the repository are copyrighted by unnamed third parties and are only licensed for use on http://w-hat.com.
+
+## Code License
 
 [![CC0](http://i.creativecommons.org/p/zero/1.0/88x31.png)](http://creativecommons.org/publicdomain/zero/1.0/)
 
