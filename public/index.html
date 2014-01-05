@@ -105,14 +105,14 @@
 			font-family: monospace;
 		}
 
-		#name2key li > details {
+		li > details {
 			font-size: 85%;
 		}
 
-		#name2key li > details summary {
+		li > details summary {
 			font-family: "lucida console", monospace;
 		}
-		#name2key details table {
+		details table {
 			width: 1024px;
 			background-color: #333;
 			border: 1px solid #444;
@@ -123,22 +123,26 @@
 			font-size: 80%;
 		}
 
-		#name2key details table th {
+		details table th {
 			text-align: center;
 		}
 
-		#name2key details table td {
+		details table td {
 			vertical-align: top;
 			font-family: "lucida console", monospace;
 			white-space: pre;
 			padding: 2px 1em;
 		}
 
-		#name2key ul {
+		details.params table td {
+			white-space: normal;
+		}
+
+		#name2key ul, #httpdb ul {
 			list-style-type: none;
 		}
 
-		#name2key details details {
+		details details {
 			margin: 1em;
 		}
 
@@ -224,8 +228,9 @@
 			nobody still plays Second Life.</p>
 
 		<h2>Can I...</h2>
-		<p>Yes, please do. Everything on this site is free and open source and all the services are
-			free to use and abuse in any manner you see fit.</p>
+		<p>Yes, please do. Everything on this site is free and
+		  <a href="https://github.com/pclewis/w-hat.com-services/">open source</a>
+		  and all the services are free to use and abuse in any manner you see fit.</p>
 
 		<h2>Who runs this site?</h2>
 		<p>masa@w-hat.com</p>
@@ -483,7 +488,7 @@ default {
 		<h1>httpdb</h1>
 
 		<h2>Pardon the mess</h2>
-		<p>API documentation and web interface for httpdb are currently unavailable.
+		<p>API documentation is a work-in-progress and the web interface is currently unavailable.
 			They will be restored as soon as possible.</p>
 
 		<h2>Free storage for LSL scripts</h2>
@@ -495,6 +500,226 @@ default {
 		<h2>Registration</h2>
 		<p>There is no need to register to use httpdb, you can just start saving and retrieving data
 			at any time.</p>
+
+		<h2>Extra Space</h2>
+		<p>If 250kb is not enough for your purposes, you can request more by emailing
+		  <a href="mailto:masa@w-hat.com">masa@w-hat.com</a>. You are also welcome to use
+		  multiple accounts to store your data.</p>
+
+		<h2>API</h2>
+		<ul>
+			<li>
+				<details>
+					<summary>GET /httpdb/&lt;path&gt;</summary>
+					<p>
+					  Retrieve a record stored in HTTPDB.
+					</p>
+                    <details class="params">
+                      <summary>Parameters</summary>
+					  <table>
+						<tbody>
+						  <tr><th>start|s</th>
+							<td>Drop specified number of leading bytes from the response.</td></tr>
+						  <tr><th>password|p</th>
+							<td>The password required to access this record.</td></tr>
+						</tbody>
+					  </table>
+					</details>
+					<details>
+						<summary>Examples</summary>
+						<table>
+							<thead>
+								<tr><th colspan="2">Request</th><th colspan="2">Response</th></tr>
+								<tr><th>Method</th><th>URL</th><th>Status</th><th>Body</th></tr>
+							</thead>
+							<tbody>
+								<tr><td>GET</td><td>/httpdb/blah</td><td>404</td><td></td></tr>
+								<tr><td>GET</td><td>/httpdb/some/path</td><td>200</td><td>some data</td></tr>
+								<tr><td>GET</td><td>/httpdb/some/path?s=2</td><td>200</td><td>me data</td></tr>
+								<tr><td>GET</td><td>/httpdb/protected</td><td>403</td><td></td></tr>
+								<tr><td>GET</td><td>/httpdb/protected?password=secret</td><td>200</td><td>top secret data</td></tr>
+							</tbody>
+						</table>
+					</details>
+				</details>
+			</li>
+
+			<li>
+				<details>
+					<summary>GET /httpdb/&lt;prefix&gt;?mode=list</summary>
+					<p>
+					  List all stored paths starting with specified prefix.
+					</p>
+                    <details class="params">
+                      <summary>Parameters</summary>
+					  <table>
+						<tbody>
+						  <tr><th>start|s</th>
+							<td>Drop specified number of leading bytes from the response.</td></tr>
+						</tbody>
+					  </table>
+					</details>
+					<details>
+						<summary>Examples</summary>
+						<table>
+							<thead>
+								<tr><th colspan="2">Request</th><th colspan="2">Response</th></tr>
+								<tr><th>Method</th><th>URL</th><th>Status</th><th>Body</th></tr>
+							</thead>
+							<tbody>
+								<tr><td>GET</td><td>/httpdb/hello?mode=list</td><td>200</td><td></td></tr>
+								<tr><td>GET</td><td>/httpdb/user_?mode=list</td><td>200</td><td>user_1<br />user_2</td></tr>
+								<tr><td>GET</td><td>/httpdb/user_?mode=list&amp;start=4</td><td>200</td><td>_1<br />user_2</td></tr>
+							</tbody>
+						</table>
+					</details>
+				</details>
+			</li>
+
+			<li>
+			  <details>
+				<summary>PUT /httpdb/&lt;path&gt;</summary>
+					<p>
+					  Create or overwrite a record in HTTPDB.
+					</p>
+                    <details class="params">
+                      <summary>Parameters</summary>
+					  <table>
+						<tbody>
+						  <tr><th>mode|m</th>
+							<td>How to handle existing data. No effect when creating new record.
+							  <ul><li>write (default) - overwrite existing data. Requires only write permission.</li>
+								<li>append - add after existing data. Requires read and write permission.</li>
+								<li>prepend - add before existing data. Requires read and write permission.</li></ul>
+						  </td></tr>
+						  <tr><th>password|p</th>
+							<td>The password required to update this record. TODO: explain</td></tr>
+						  <tr><th>read_password|readpass|rp</th>
+							<td>A password that will be required to read this record in the future.
+							  If the record already exists, setting this requires admin permission.</td></tr>
+						  <tr><th>write_password|writepass|wp</th>
+							<td>A password that will be required to write to this record in the future.
+							  If the record already exists, setting this requires admin permission.</td></tr>
+						</tbody>
+					  </table>
+					</details>
+					<details>
+						<summary>Examples</summary>
+						<table>
+							<thead>
+								<tr><th colspan="3">Request</th><th colspan="2">Response</th></tr>
+								<tr><th>Method</th><th>URL</th><th>Body</th><th>Status</th><th>Body</th></tr>
+							</thead>
+							<tbody>
+								<tr><td>PUT</td><td>/httpdb/test</td><td>Hello<td>201</td><td>249995</td></tr>
+								<tr><td>PUT</td><td>/httpdb/test?mode=append</td><td> World</td><td>200</td><td>249989</td></tr>
+							</tbody>
+						</table>
+					</details>
+				</details>
+			</li>
+
+			<li>
+			  <details>
+				<summary>DELETE /httpdb/&lt;path&gt;</summary>
+					<p>
+					  Delete a record in HTTPDB.
+					</p>
+                    <details class="params">
+                      <summary>Parameters</summary>
+					  <table>
+						<tbody>
+						  <tr><th>password|p</th>
+							<td>The password required to update this record. TODO: explain</td></tr>
+						</tbody>
+					  </table>
+					</details>
+					<details>
+						<summary>Examples</summary>
+						<table>
+							<thead>
+								<tr><th colspan="2">Request</th><th colspan="2">Response</th></tr>
+								<tr><th>Method</th><th>URL</th><th>Status</th><th>Body</th></tr>
+							</thead>
+							<tbody>
+								<tr><td>DELETE</td><td>/httpdb/test</td><td>200</td><td>250000</td></tr>
+								<tr><td>DELETE</td><td>/httpdb/test</td><td>404</td><td></td></tr>
+							</tbody>
+						</table>
+					</details>
+				</details>
+			</li>
+
+			<li>
+			  <details>
+				<summary>POST /httpdb/&lt;path&gt;</summary>
+					<p>
+					  Change the read and/or write password on a record.
+					</p>
+                    <details class="params">
+                      <summary>Parameters</summary>
+					  <table>
+						<tbody>
+						  <tr><th>password|p</th>
+							<td>Current admin password for owner of record.</td></tr>
+						  <tr><th>read_password|readpass|rp</th>
+							<td>New password to require for future reads of record.</td></tr>
+						  <tr><th>write_password|writepass|wp</th>
+							<td>New password to require for future writes to record.</td></tr>
+						</tbody>
+					  </table>
+					</details>
+					<details>
+						<summary>Examples</summary>
+						<table>
+							<thead>
+								<tr><th colspan="2">Request</th><th colspan="2">Response</th></tr>
+								<tr><th>Method</th><th>URL</th><th>Status</th><th>Body</th></tr>
+							</thead>
+							<tbody>
+								<tr><td>POST</td><td>/httpdb/test?wp=write</td><td>403</td><td></td></tr>
+								<tr><td>POST</td><td>/httpdb/test?wp=write&amp;p=admin</td><td>200</td><td></td></tr>
+							</tbody>
+						</table>
+					</details>
+				</details>
+			</li>
+
+			<li>
+			  <details>
+				<summary>GET /httpdb/__sys/space/free</summary>
+					<p>
+					  Get remaining free space.
+					</p>
+			  </details>
+			</li>
+
+			<li>
+			  <details>
+				<summary>GET /httpdb/__sys/space/used</summary>
+					<p>
+					  Get count of space used.
+					</p>
+			  </details>
+			</li>
+
+			<li>
+			  <details>
+				<summary>GET /httpdb/__sys/space/available</summary>
+					<p>
+					  Get total space allocated to you.
+					</p>
+			  </details>
+			</li>
+		</ul>
+
+
+		<h2>Related Projects</h2>
+		<ul>
+		  <li><a href="http://code.google.com/p/httpdb-gae/">httpdb-gae</a> is an implementation of httpdb in Python for running on Google App Engine (last updated in 2009).</li>
+		  <li>Zero Linden created a similar project called Silo in 2006, but his site is gone.</li>
+		</ul>
+
 	</section>
 
 	<a class="twitter-timeline" data-dnt="true" href="https://twitter.com/www_hat" data-widget-id="343859026339196928">Tweets by @www_hat</a>
@@ -591,3 +816,4 @@ default {
 	</script>
 </body>
 </html>
+<!-- -*- tab-width: 4; indent-tabs-mode:t; -*- -->
